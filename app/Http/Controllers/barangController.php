@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\barang;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class barangController extends Controller
@@ -12,9 +12,17 @@ class barangController extends Controller
         return view('barang');
     }
 
-    public function praktikum()
-    {
-        return view('utama');
+    public function index(){
+        $listbarang = Barang::all();
+
+        foreach ($listbarang as $key => $barang){
+            $listbarang[$key]->totalBelanjaan = $barang->harga * $barang->quantity;
+            $listbarang[$key]->diskon = $this->hitungDiskon($listbarang[$key]->totalBelanjaan);
+            $potonganHarga = ($listbarang[$key]->diskon / 100) * $listbarang[$key]->totalBelanjaan;
+            $listbarang[$key]->hargaSetelahDiskon = $listbarang[$key]->totalBelanjaan - $potonganHarga;
+
+        }
+        return view('index',['ListBarang'=>$listbarang]);
     }
 
     public function proses(Request $request)
@@ -69,4 +77,44 @@ class barangController extends Controller
 
         return view('outputBarang', ['output' => $output]);
     }
+    private function hitungDiskon($totalHarga)
+    {
+        if ($totalHarga >= 500000) {
+            return 50;
+        } elseif ($totalHarga >= 200000) {
+            return 20;
+        } elseif ($totalHarga >= 100000) {
+            return 10;
+        }
+
+        return 0;
+    }
+
+    public function editForm($id)
+    {
+        $barang = Barang::find($id);
+        return view('edit', ['barang' => $barang]);
+    }
+
+
+
+    public function edit(Request $request, $id)
+    {
+
+        $barang = Barang::find($id);
+
+        if ($barang) {
+            //'kodebarang', 'namabarang', 'jenisvarian', 'qty', 'hargajual'
+            $barang->kodebarang = $request->kodebarang;
+            $barang->namabarang = $request->namabarang;
+            $barang->varian = $request->varian;
+            $barang->quantity = $request->quantity;
+            $barang->harga = $request->harga;
+            $barang->save();
+            return redirect()->route('home');
+
+
+        }
+    }
 }
+
