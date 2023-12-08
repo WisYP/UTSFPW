@@ -30,6 +30,7 @@
                                 <td>{{$barang->hargaSetelahDiskon}}</td>
                                 <td>
                                     <a href="{{route('edit.form',['id'=>$barang->id])}}" class="btn btn-primary">Edit</a>
+                                    <a href="{{route('barang.destroy',['id'=>$barang->id])}}" class="btn btn-danger">Delete</a>
                                 </td>
                             </tr>
                          @endforeach

@@ -116,5 +116,17 @@ class barangController extends Controller
 
         }
     }
+    public function delete($id)
+    {
+        $barang = Barang::find($id);
+    
+        if ($barang) {
+            $barang->delete();
+            return redirect()->route('home')->with('success', 'Barang deleted successfully');
+        } else {
+            return redirect()->route('home')->with('error', 'Barang not found');
+        }
+    }
+    
 }
 
